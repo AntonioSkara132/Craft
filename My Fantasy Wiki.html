@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Fantasy Wiki</title>
+  <meta name="description" content="A lightweight, single-file wiki template for worldbuilding.">
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+  <link href="My%20Fantasy%20Wiki_files/css2.css" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0b0d10;     /* dark background */
+      --panel:#101419;   /* card + sidebar */
+      --muted:#8892a6;   /* subtle text */
+      --text:#e5e7eb;    /* main text */
+      --brand:#7c9cff;   /* accent */
+      --brand-2:#7fffd4; /* secondary accent */
+      --ring: rgba(124,156,255,.45);
+      --shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    :root.light{
+      --bg:#f6f7fb;
+      --panel:#ffffff;
+      --muted:#6b7280;
+      --text:#0b0d10;
+      --brand:#3b82f6;
+      --brand-2:#06b6d4;
+      --ring: rgba(59,130,246,.35);
+      --shadow: 0 8px 26px rgba(0,0,0,.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg); color:var(--text); display:flex; min-height:100vh;
+    }
+    .app{display:grid; grid-template-columns: 300px 1fr; width:100%;}
+    aside{
+      background:linear-gradient(180deg, rgba(124,156,255,.08), transparent 25%), var(--panel);
+      border-right:1px solid rgba(124,156,255,.15);
+      padding:20px; position:sticky; top:0; height:100vh; overflow:auto;
+    }
+    main{padding:24px 28px;}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.3px;}
+    .brand .logo{width:34px; height:34px; border-radius:10px; background:radial-gradient(circle at 30% 30%, var(--brand), var(--brand-2)); box-shadow:var(--shadow)}
+    .muted{color:var(--muted)}
+
+    .search{position:relative; margin:16px 0 12px}
+    .search input{
+      width:100%; padding:12px 40px 12px 14px; border-radius:12px; border:1px solid rgba(124,156,255,.22);
+      background:rgba(124,156,255,.06); color:var(--text); outline:none;
+    }
+    .search input:focus{box-shadow:0 0 0 6px var(--ring);}
+    .search .icon{position:absolute; right:10px; top:50%; transform:translateY(-50%); opacity:.6}
+
+    nav .section-title{margin-top:18px; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
+    .navlist{list-style:none; margin:8px 0 0; padding:0;}
+    .navlist li{margin:2px 0}
+    .navlist a{
+      display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; text-decoration:none; color:var(--text);
+    }
+    .navlist a:hover{background:rgba(124,156,255,.10)}
+    .navlist a.active{background:rgba(124,156,255,.18); box-shadow:inset 0 0 0 1px rgba(124,156,255,.25)}
+
+    .toolbar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:8px 0 18px}
+    .btn{
+      background:linear-gradient(180deg, rgba(124,156,255,.16), rgba(124,156,255,.06)); border:1px solid rgba(124,156,255,.25);
+      padding:8px 12px; border-radius:10px; color:var(--text); cursor:pointer;
+    }
+    .btn:hover{filter:brightness(1.1)}
+    .btn.ghost{background:transparent}
+    .chip{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid rgba(124,156,255,.25); background:rgba(124,156,255,.08); font-size:12px; cursor:pointer}
+    .chip.active{background:rgba(124,156,255,.22)}
+
+    .grid{display:grid; grid-template-columns: repeat( auto-fill, minmax(260px, 1fr)); gap:16px}
+    .card{
+      background:var(--panel); border:1px solid rgba(124,156,255,.18); border-radius:16px; box-shadow:var(--shadow); overflow:hidden;
+      display:flex; flex-direction:column;
+    }
+    .card .cover{height:140px; background-size:cover; background-position:center}
+    .card .content{padding:14px}
+    .card h3{margin:4px 0 6px}
+    .meta{display:flex; gap:8px; flex-wrap:wrap}
+
+    article{max-width:900px}
+    article .title{font-size:34px; margin:0 0 10px}
+    article .subtitle{color:var(--muted); margin-bottom:16px}
+    article .banner{width:100%; height:260px; border-radius:16px; object-fit:cover; border:1px solid rgba(124,156,255,.2);}
+    article .block{background:var(--panel); padding:18px; border-radius:14px; border:1px solid rgba(124,156,255,.18); box-shadow:var(--shadow)}
+
+    .kvl{
+      display:grid; grid-template-columns: 160px 1fr; gap:10px; margin:10px 0
+    }
+
+    .hr{height:1px; background:linear-gradient(90deg, rgba(124,156,255,.0), rgba(124,156,255,.5), rgba(124,156,255,.0)); margin:18px 0}
+
+    .footer{color:var(--muted); font-size:12px; margin-top:24px}
+
+    /* Responsive */
+    @media (max-width: 920px) {
+      .app{grid-template-columns: 1fr}
+      aside{position:static; height:auto}
+    }
+
+    /* Simple markdown-ish content styling */
+    .prose h2{margin:22px 0 6px}
+    .prose h3{margin:16px 0 6px}
+    .prose p{line-height:1.7}
+    .prose ul{padding-left:18px}
+    .prose code{padding:2px 6px; border-radius:6px; background:rgba(124,156,255,.18)}
+    a.inline{color:var(--brand)}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand"><div class="logo"></div><div>My Fantasy <span class="muted">Wiki</span></div></div>
+      <div class="search">
+        <input id="search" placeholder="Search characters, places, magic…">
+        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"></circle></svg>
+      </div>
+      <nav>
+        <div class="section-title">Explore</div>
+        <ul class="navlist" id="nav">
+          <li><a href="#/home" data-route="home">🏠 Home</a></li>
+          <li><a href="#/type/character" data-route="type:character">🧙 Characters</a></li>
+          <li><a href="#/type/location" data-route="type:location">🗺️ Locations</a></li>
+          <li><a href="#/type/faction" data-route="type:faction">🏰 Factions</a></li>
+          <li><a href="#/type/magic" data-route="type:magic">✨ Magic</a></li>
+          <li><a href="#/type/article" data-route="type:article">📜 Lore &amp; Articles</a></li>
+          <li><a href="#/timeline" data-route="timeline">🕰️ Timeline</a></li>
+          <li><a href="#/all" data-route="all">🧭 All Entries</a></li>
+        </ul>
+      </nav>
+      <div class="section-title">Tools</div>
+      <div class="toolbar">
+        <button class="btn" id="toggleTheme">Toggle Theme</button>
+        <button class="btn" id="exportData">Export</button>
+        <label class="btn" for="importFile" style="cursor:pointer">Import</label>
+        <input id="importFile" type="file" accept="application/json" hidden="">
+      </div>
+      <div class="footer">Tip: Edit or add entries using the <b>Edit</b> button on any page. Your changes are saved to <b>Local Storage</b>. Export a backup JSON when you're happy.</div>
+    </aside>
+
+    <main>
+      <div id="breadcrumbs" class="muted">Home / Lore &amp; Articles / The One Sword</div>
+      <div id="filters" class="toolbar"><button class="chip">NPC</button><button class="chip">One blade</button><button class="chip">city</button><button class="chip">conflict</button><button class="chip">economy</button><button class="chip">elemental</button><button class="chip">fire</button><button class="chip">guild</button><button class="chip">human</button><button class="chip">law</button><button class="chip">rebels</button><button class="chip">ritual</button><button class="chip">smugglers</button><button class="chip">soul eating</button><button class="chip">swords</button><button class="chip">trade</button><button class="chip">volcanic</button></div>
+      <div id="view">
+    <article>
+      <img class="banner" src="My%20Fantasy%20Wiki_files/sword-handle-3376779.webp" alt="The One Sword">
+      <h1 class="title">The One Sword</h1>
+      <div class="subtitle">Sword enchanted by Command Block powers</div>
+      <div class="meta"><span class="chip" onclick="tagJump('law')">law</span> <span class="chip" onclick="tagJump('economy')">economy</span> <span class="chip" onclick="tagJump('conflict')">conflict</span></div>
+      <div class="hr"></div>
+
+      <div class="block"><h3>Facts</h3><div class="kvl"><div class="muted">created</div><div>Year 27 AC</div></div><div class="kvl"><div class="muted">maker</div><div>All Republic programming team</div></div></div>
+      <div class="hr"></div>
+
+      <div class="prose"><p></p><h2>Purpose</h2><p></p><p>To fund automata and city defenses.</p><p></p><h2>Impact</h2><p></p><p></p><ul><li>Drives mages underground.</li>
+<li>Enriches glasswright guilds.</li>
+<li>Fuels Ashen Band recruitment.</li></ul><p></p></div>
+
+      
+        <div class="hr"></div>
+        <div class="block">
+          <h3>Timeline</h3>
+          <div class="kvl"><div class="muted">1487</div><div>Decree announced</div></div>
+        </div>
+
+      <div class="hr"></div>
+      <div class="toolbar">
+        <button class="btn" onclick="editArticle('one-sword')">Edit</button>
+        <button class="btn ghost" onclick="duplicateArticle('one-sword')">Duplicate</button>
+        <button class="btn ghost" onclick="deleteArticle('one-sword')">Delete</button>
+      </div>
+    </article></div>
+    </main>
+  </div>
+
+<script>
+/******************************
+ *  FANTASY WIKI TEMPLATE
+ *  - Single-file SPA (no build tools)
+ *  - Data saved in localStorage
+ *  - Import/Export JSON
+ *  - Tag filters + Search + Timeline
+ *  - Simple editor per article
+ ******************************/
+
+// --- Demo Data (edit freely) --- //
+const DEMO = {
+  meta: { title: "My Fantasy Wiki", version: 1 },
+  articles: [
+    {
+      id: "char-Kogy",
+      type: "character",
+      title: "Kogy, Kishko",
+      cover: "https://images.unsplash.com/photo-1606117331085-5760e3bfb5a1?q=80&w=1200&auto=format&fit=crop",
+      tags: ["NPC","swords","soul eating"],
+      summary: "Ex human hero found out to be NPC controlled by World goverment, trying to take revenge on the world",
+      fields: {
+        race: "NPC",
+        occupation: "Admin → Mercenary",
+        age: "28",
+        alignment: "Herobrine",
+        status: "Alive"
+      },
+      content: `## Personality\n
+Lighearted, hero type.\n
+## Abilities\n
+- Soul eating: Apsorbing the soul of the foes inside range of 1 m
+## Backstory\n
+Former republic policeman turned admin was one of the most skilled admins of all time, breaking all of the testing ground records. \n
+## Relationships\n
+- **Seris Dhal** — enigmatic mentor.\n- **House Vael** — unknown bloodline ties.`,
+      timeline: [ { year: 1489, title: "Steals the Emberblade" }, { year: 1493, title: "Leads the Ash Market revolt" } ]
+    },
+    {
+      id: "loc-emberfall",
+      type: "location",
+      title: "Emberfall",
+      cover: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1200&auto=format&fit=crop",
+      tags: ["city","volcanic","trade"],
+      summary: "A city terraced around a sleeping volcano; markets glow at dusk.",
+      fields: { region:"The Cinder Coast", population:"120,000", rulers:"Council of Glass" },
+      content: `## Overview\n
+Built on cooled lava flows with canals of warm runoff. Night markets use obsidian mirrors to throw light across alleys.\n
+## Notable Places\n
+- Glass Council Hall\n- Ash Market\n- The Whispering Vents\n
+## Conflicts\n
+The **Spark Tithe**—tax on magic—funds the Council's automata.`,
+      timeline: [ { year: 1320, title: "Founded by glasswalkers" } ]
+    },
+    {
+      id: "fac-ashen-band",
+      type: "faction",
+      title: "The Ashen Band",
+      cover: "https://images.unsplash.com/photo-1547394765-185e1e68f34e?q=80&w=1200&auto=format&fit=crop",
+      tags: ["rebels","guild","smugglers"],
+      summary: "Network of smugglers turned freedom fighters along the Cinder Coast.",
+      fields: { leader:"Seris Dhal", base:"Ash Market", motto:"Through Soot, Stars" },
+      content: `## Origin\n
+Once a smuggling ring, now a decentralized insurgency.\n
+## Tactics\n
+- Ember-signals from rooftop braziers\n- Collapsible markets for rapid retreats\n
+## Allies & Enemies\n
+Allies: slum unions, some glasswrights. Enemies: **Council of Glass**.`,
+      timeline: [ { year: 1492, title: "First successful raid on the Tithe Treasury" } ]
+    },
+    {
+      id: "mag-embercraft",
+      type: "magic",
+      title: "Embercraft",
+      cover: "https://images.unsplash.com/photo-1496302662116-35cc4f36df92?q=80&w=1200&auto=format&fit=crop",
+      tags: ["elemental","fire","ritual"],
+      summary: "A heat-bargain magic: power rises with personal risk.",
+      fields: { cost:"Burn risk, exhaustion", focus:"Heated steel, embers", taboo:"Cold iron" },
+      content: `## Rules\n
+1. Heat offered equals force gained.\n2. Cold iron nullifies channels.\n3. Public embers amplify but attract ash-spirits.\n
+## Known Forms\n
+- Emberblade\n- Kiln-Sight\n- Sparkstep`,
+      timeline: []
+    },
+    {
+      id: "art-spark-tithe",
+      type: "article",
+      title: "The Spark Tithe",
+      cover: "https://images.unsplash.com/photo-1591012911207-0dbab842d57b?q=80&w=1200&auto=format&fit=crop",
+      tags: ["law","economy","conflict"],
+      summary: "A levy on magical acts, paid in heat-credit and service.",
+      fields: { introduced:"Year 1487", author:"Council Decree #17" },
+      content: `## Purpose\n
+To fund automata and city defenses.\n
+## Impact\n
+- Drives mages underground.\n- Enriches glasswright guilds.\n- Fuels Ashen Band recruitment.`,
+      timeline: [ { year: 1487, title: "Decree announced" } ]
+    }
+  ]
+};
+
+// --- Persistence --- //
+const KEY = 'fantasy-wiki-data-v1';
+function loadData(){
+  const saved = localStorage.getItem(KEY);
+  return saved ? JSON.parse(saved) : DEMO;
+}
+function saveData(data){
+  localStorage.setItem(KEY, JSON.stringify(data));
+}
+let DB = loadData();
+
+// --- Utility --- //
+const el = (sel, root=document) => root.querySelector(sel);
+const els = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+function slugify(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+function escapeHtml(s){ return s.replace(/[&<>"']/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m])) }
+
+// Tiny markdown-ish to HTML (headings, bold/italic, code, lists, links)
+function md(str){
+  return escapeHtml(str)
+    .replace(/^### (.*)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.*)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.*)$/gm, '<h1>$1</h1>')
+    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+    .replace(/\*(.*?)\*/g, '<i>$1</i>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/^- (.*)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a class="inline" href="$2" target="_blank" rel="noreferrer">$1<\/a>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^/g, '<p>') + '</p>';
+}
+
+// --- Rendering --- //
+const VIEW = el('#view');
+const BREAD = el('#breadcrumbs');
+const FILTERS = el('#filters');
+const SEARCH = el('#search');
+
+const TYPES = ["character","location","faction","magic","article"];
+const TYPE_LABEL = {
+  character:"Characters", location:"Locations", faction:"Factions", magic:"Magic", article:"Lore & Articles"
+};
+
+function setActiveNav(){
+  els('.navlist a').forEach(a=>{
+    const href = a.getAttribute('href');
+    a.classList.toggle('active', location.hash.startsWith(href));
+  });
+}
+
+function allTags(){
+  const t = new Set();
+  DB.articles.forEach(a=>a.tags.forEach(tag=>t.add(tag)));
+  return Array.from(t).sort();
+}
+
+function renderChips(activeTags){
+  const tags = allTags();
+  FILTERS.innerHTML = '';
+  if(tags.length){
+    const frag = document.createDocumentFragment();
+    tags.forEach(tag=>{
+      const b = document.createElement('button');
+      b.className = 'chip' + (activeTags.includes(tag)?' active':'');
+      b.textContent = tag;
+      b.onclick = ()=>{
+        const list = activeTags.includes(tag) ? activeTags.filter(t=>t!==tag) : [...activeTags, tag];
+        navigate(`#${currentRoute.base}/${currentRoute.param || ''}?tags=${encodeURIComponent(list.join(','))}&q=${encodeURIComponent(SEARCH.value)}`);
+      };
+      frag.appendChild(b);
+    });
+    FILTERS.appendChild(frag);
+  }
+}
+
+function card(a){
+  return `<div class="card">
+    <div class="cover" style="background-image:url('${a.cover || ''}')"></div>
+    <div class="content">
+      <div class="meta">${a.tags.slice(0,3).map(t=>`<span class=chip>${t}</span>`).join(' ')}</div>
+      <h3>${a.title}</h3>
+      <div class="muted">${a.summary||''}</div>
+      <div class="hr"></div>
+      <div class="toolbar">
+        <a class="btn" href="#/article/${a.id}">Open</a>
+        <button class="btn ghost" onclick="editArticle('${a.id}')">Edit</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function listView(items){
+  VIEW.innerHTML = `<div class=grid>${items.map(card).join('')}</div>`;
+}
+
+function articleView(a){
+  const kv = Object.entries(a.fields||{}).map(([k,v])=>`<div class=kvl><div class=muted>${k}</div><div>${v}</div></div>`).join('');
+  VIEW.innerHTML = `
+    <article>
+      ${a.cover?`<img class="banner" src="${a.cover}" alt="${a.title}">`:''}
+      <h1 class=title>${a.title}</h1>
+      <div class=subtitle>${a.summary||''}</div>
+      <div class="meta">${a.tags.map(t=>`<span class=chip onclick="tagJump('${t}')">${t}</span>`).join(' ')}</div>
+      <div class="hr"></div>
+
+      ${kv?`<div class=block><h3>Facts</h3>${kv}</div>`:''}
+      <div class="hr"></div>
+
+      <div class="prose">${md(a.content||'')}</div>
+
+      ${(a.timeline&&a.timeline.length)?`
+        <div class="hr"></div>
+        <div class=block>
+          <h3>Timeline</h3>
+          ${a.timeline.sort((x,y)=>x.year-y.year).map(e=>`<div class=kvl><div class=muted>${e.year}</div><div>${e.title}</div></div>`).join('')}
+        </div>`:''}
+
+      <div class="hr"></div>
+      <div class=toolbar>
+        <button class="btn" onclick="editArticle('${a.id}')">Edit</button>
+        <button class="btn ghost" onclick="duplicateArticle('${a.id}')">Duplicate</button>
+        <button class="btn ghost" onclick="deleteArticle('${a.id}')">Delete</button>
+      </div>
+    </article>`;
+}
+
+function breadcrumbs(parts){
+  BREAD.innerHTML = parts.join(' / ');
+}
+
+function timelineView(){
+  const events = [];
+  DB.articles.forEach(a=> (a.timeline||[]).forEach(e=> events.push({year:e.year, title:e.title, ref:a.id})) );
+  events.sort((a,b)=>a.year-b.year);
+  VIEW.innerHTML = `<div class=block>
+    <h3>World Timeline</h3>
+    ${events.map(e=>`<div class=kvl><div class=muted>${e.year}</div><div><a class="inline" href="#/article/${e.ref}">${e.title}</a></div></div>`).join('')}
+  </div>`;
+}
+
+// --- Edit / CRUD --- //
+function editArticle(id){
+  const a = DB.articles.find(x=>x.id===id);
+  if(!a) return;
+  const json = JSON.stringify(a, null, 2);
+  VIEW.innerHTML = `<div class=block>
+    <h3>Edit Entry</h3>
+    <p class=muted>Update fields and press <b>Save</b>. IDs are used in links; keep them unique.</p>
+    <textarea id="editor" style="width:100%; height:420px; border-radius:10px; padding:12px; background:var(--panel); color:var(--text); border:1px solid rgba(124,156,255,.25)">${json}</textarea>
+    <div class=toolbar>
+      <button class=btn onclick="saveEdit('${id}')">Save</button>
+      <a class="btn ghost" href="#/article/${id}">Cancel</a>
+    </div>
+  </div>`;
+}
+function saveEdit(oldId){
+  try{
+    const next = JSON.parse(el('#editor').value);
+    const idx = DB.articles.findIndex(x=>x.id===oldId);
+    if(idx===-1) throw new Error('Not found');
+    DB.articles[idx] = next;
+    saveData(DB);
+    navigate(`#/article/${next.id}`);
+  }catch(e){ alert('Invalid JSON: '+e.message); }
+}
+function duplicateArticle(id){
+  const a = DB.articles.find(x=>x.id===id);
+  if(!a) return;
+  const copy = JSON.parse(JSON.stringify(a));
+  copy.id = a.id + '-copy';
+  copy.title = a.title + ' (Copy)';
+  DB.articles.push(copy);
+  saveData(DB);
+  navigate(`#/article/${copy.id}`);
+}
+function deleteArticle(id){
+  if(!confirm('Delete this entry?')) return;
+  DB.articles = DB.articles.filter(x=>x.id!==id);
+  saveData(DB);
+  navigate('#/all');
+}
+function tagJump(tag){
+  navigate(`#/all?tags=${encodeURIComponent(tag)}`);
+}
+
+// --- Search & Filter --- //
+function queryParams(){
+  const q = new URLSearchParams(location.hash.split('?')[1]||'');
+  return {
+    q: q.get('q') || '',
+    tags: (q.get('tags')||'').split(',').filter(Boolean)
+  };
+}
+function filterItems(items, q, tags){
+  const qq = q.toLowerCase();
+  return items.filter(a=>{
+    const hit = (
+      a.title.toLowerCase().includes(qq) ||
+      (a.summary||'').toLowerCase().includes(qq) ||
+      (a.content||'').toLowerCase().includes(qq)
+    );
+    const tagOk = tags.length? tags.every(t=> a.tags.includes(t)) : true;
+    return hit && tagOk;
+  });
+}
+
+// --- Router --- //
+let currentRoute = { base: 'home', param: null };
+function parseHash(){
+  const [path] = location.hash.split('?');
+  const parts = path.replace(/^#\//,'').split('/');
+  const base = parts[0] || 'home';
+  const param = parts[1] || null;
+  return { base, param };
+}
+function navigate(hash){ location.hash = hash; }
+
+function render(){
+  currentRoute = parseHash();
+  setActiveNav();
+  const { q, tags } = queryParams();
+  SEARCH.value = q;
+  renderChips(tags);
+
+  if(currentRoute.base==='home'){
+    breadcrumbs(['Home']);
+    const featured = DB.articles.slice(0,6);
+    listView(filterItems(featured, q, tags));
+  }
+  else if(currentRoute.base==='type'){
+    const t = currentRoute.param;
+    breadcrumbs(['Home', TYPE_LABEL[t]||t]);
+    const items = DB.articles.filter(a=>a.type===t);
+    listView(filterItems(items, q, tags));
+  }
+  else if(currentRoute.base==='article'){
+    const a = DB.articles.find(x=>x.id===currentRoute.param);
+    if(a){ breadcrumbs(['Home', TYPE_LABEL[a.type]||a.type, a.title]); articleView(a); }
+    else { VIEW.textContent = 'Not found.' }
+  }
+  else if(currentRoute.base==='timeline'){
+    breadcrumbs(['Home','Timeline']);
+    timelineView();
+  }
+  else { // all
+    breadcrumbs(['Home','All Entries']);
+    listView(filterItems(DB.articles, q, tags));
+  }
+}
+
+window.addEventListener('hashchange', render);
+SEARCH.addEventListener('input', ()=>{
+  const tags = queryParams().tags.join(',');
+  navigate(`#${currentRoute.base}/${currentRoute.param||''}?tags=${encodeURIComponent(tags)}&q=${encodeURIComponent(SEARCH.value)}`);
+});
+
+// --- Theme --- //
+(function initTheme(){
+  const pref = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light':'dark');
+  if(pref==='light') document.documentElement.classList.add('light');
+  el('#toggleTheme').onclick = ()=>{
+    document.documentElement.classList.toggle('light');
+    localStorage.setItem('theme', document.documentElement.classList.contains('light')?'light':'dark');
+  };
+})();
+
+// --- Import/Export --- //
+function download(filename, text){
+  const a = document.createElement('a');
+  a.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(text));
+  a.setAttribute('download', filename);
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+el('#exportData').onclick = ()=>{
+  download('fantasy-wiki.json', JSON.stringify(DB, null, 2));
+};
+
+el('#importFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const data = JSON.parse(reader.result);
+      if(!data.articles) throw new Error('Invalid format: missing articles');
+      DB = data; saveData(DB); render();
+    }catch(err){ alert('Import failed: ' + err.message); }
+  };
+  reader.readAsText(file);
+});
+
+// --- Kickoff --- //
+if(!localStorage.getItem(KEY)) saveData(DB); // seed demo on first load
+if(!location.hash) location.hash = '#/home';
+render();
+</script>
+
+
+
+</body></html>
